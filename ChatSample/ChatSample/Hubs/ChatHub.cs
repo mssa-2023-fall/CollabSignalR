@@ -12,3 +12,5 @@ namespace ChatSample.Hubs
         }
     }
 }
+
+//Temp Comment for rescanning with Codacy
