@@ -2,40 +2,78 @@
 using Microsoft.AspNetCore.SignalR.Client;
 class program
 {
-    static void Main(string[] args)
-    {
-        var hubUrl = "Console.WriteLine('https://chatsample20231024085542.azurewebsites.net/chat')";
+    static async void Main(string[] args)
+    {   //defualt hub
+        var hubUrl = "https://chatsample20231024085542.azurewebsites.net/chat";
 
         Console.WriteLine("Which hub do you want to connect to? Press Enter for Default");
-        Console.WriteLine($"[{hubUrl}]");
-
+        
+        //chance to connect to a different hub
         var userHubUrl = Console.ReadLine();
-        var _connection = new HubConnectionBuilder()
+        var connection = new HubConnectionBuilder()
                         .WithUrl(string.IsNullOrEmpty(userHubUrl) ? hubUrl : userHubUrl)
                         .Build();
-        _connection.StartAsync().Wait(); 
+        
+        Dictionary<string, string> userDictionary = new Dictionary<string, string>(); //Dictionary to map connectionId with Users
 
-        Dictionary<string, string> UserInfo = new Dictionary<string, string>();
+        //receive message
+        connection.On<string, string>("ReceiveMessage", (user, message) =>
+        {
+            Console.WriteLine($"{user}: {message}");
+        });
 
-        Console.WriteLine("Whats your name?");
-        string userName = Console.ReadLine();
+        //notificaiton of connected user
+        connection.On<string>("UserConnected", (connectionId) =>
+        {
+            Console.WriteLine($"User connected with connectionId: {connectionId}");
+            Console.WriteLine("Enter your username: ");
+            var username = Console.ReadLine();
+            userDictionary[connectionId] = username;
+            Console.WriteLine($"Welcome, {username}");
 
-        StoreNames(userName, UserInfo);
+        });
 
-        Console.WriteLine($"{userName} what is your message?");
-        string message = Console.ReadLine();
+        //notification of disconnected user
+        connection.On<string>("UserDisconnected", (connectionId) =>
+        {
+            if (userDictionary.ContainsKey(connectionId))
+            {
+                var disconnectedUser = userDictionary[connectionId];
+                Console.WriteLine($"{disconnectedUser} has disconnected.");
+                userDictionary.Remove(connectionId);
+            }
+        });
 
-        //_connection.InvokeAsync("SendMessage", userName, message).Wait(); Could this be a way to send the message?
+        try
+        {
+            await connection.StartAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error connection to WoN Chat server: {ex.Message}");
+        }
 
-        _connection.On<string, string>("broadcastMessage", (s1, s2) => Console.WriteLine(s1));
+        //Enter message and send message async
+        while(true)
+        {
+            Console.Write($"Enter Message: ");
+            var message = Console.ReadLine();
+
+            if (userDictionary.ContainsKey(connection.ConnectionId))
+            {
+                var username = userDictionary[connection.ConnectionId];
+                await connection.InvokeAsync("SendMessage", username, message);
+            }
+        }
+       
+
+       
     }
-    static void StoreNames(string user, Dictionary<string, string> storeNames)
-    {
-        if (storeNames.Keys == null) throw new ArgumentException("Name cannot be null", "Error");
-        storeNames.TryAdd(user, "Session User");
-    }
+    
 
 }
 
 // Hub: https://chatsample20231024085542.azurewebsites.net/chat
 //Collect UserName
+
+//Leaving it open, it is commited under Development-bm
