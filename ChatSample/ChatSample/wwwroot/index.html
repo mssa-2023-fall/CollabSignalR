@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html>
+
 <head>
     <title>SignalR Simple Chat</title>
     <style type="text/css">
@@ -9,8 +10,22 @@
             padding: 20px;
             margin: 20px;
         }
+
+        span {
+            margin: 0 5px;
+        }
+
+        ul#discussion li {
+            margin-bottom: 10px;
+        }
+
+        ul#discussion div {
+            display: inline-block;
+            margin-left: 10px;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <input type="text" id="message" />
@@ -33,8 +48,8 @@
 
             // Start the connection.
             var connection = new signalR.HubConnectionBuilder()
-                                .withUrl('/chat')
-                                .build();
+                .withUrl('/chat')
+                .build();
 
             // Create a function that the hub can call to broadcast messages.
             connection.on('broadcastMessage', function (name, message) {
@@ -44,6 +59,21 @@
                 // Add the message to the page.
                 var liElement = document.createElement('li');
                 liElement.innerHTML = '<strong>' + encodedName + '</strong>:&nbsp;&nbsp;' + encodedMsg;
+
+                //Emojis
+                var emojiWrapper = document.createElement('div');
+                var emojis = ['&#128512;', '&#127789;', '&#128578;']; // Add more emojis if you want.
+                emojis.forEach(function (emojiCode) {
+                    var emoji = document.createElement('span');
+                    emoji.innerHTML = emojiCode;
+                    emoji.style.cursor = 'pointer';
+                    emoji.addEventListener('click', function () {
+                        emojiWrapper.innerHTML = emojiCode; // Show only the clicked emoji.
+                    });
+                    emojiWrapper.appendChild(emoji);
+                });
+
+                liElement.appendChild(emojiWrapper);
                 document.getElementById('discussion').appendChild(liElement);
             });
 
@@ -60,11 +90,12 @@
                         messageInput.focus();
                         event.preventDefault();
                     });
-            })
-            .catch(error => {
-                console.error(error.message);
-            });
+                })
+                .catch(error => {
+                    console.error(error.message);
+                });
         });
     </script>
 </body>
+
 </html>
