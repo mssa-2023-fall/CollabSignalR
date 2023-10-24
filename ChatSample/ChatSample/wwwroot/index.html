@@ -28,6 +28,8 @@
 
             // Get the user name and store it to prepend to messages.
             var name = prompt('Enter your name:', '');
+                        
+            //stops injections in the name
             while (name.length > 15 || name.length < 3 || !(/^[a-zA-Z]*$/.test(name))) {
                 alert("Invalid name try again!");
                 name = prompt('Enter your name:', '');
@@ -58,7 +60,7 @@
                     console.log('connection started');
                     document.getElementById('sendmessage').addEventListener('click', function (event) {
                         //stops injections in the message
-                        if (!(/^[a-zA-Z]*$/.test(messageInput.value))) {
+                        if (!(/^[^<>]+$/.test(messageInput.value))) {
                             alert("Invalid msg try again!");
                             return;
                         }
