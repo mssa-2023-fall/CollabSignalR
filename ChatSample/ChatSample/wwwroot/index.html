@@ -11,17 +11,25 @@
             margin: 20px;
         }
 
-        span {
+        .emoji-reaction {
+            display: none;
+            cursor: pointer;
+        }
+
+        .emoji-wrapper span {
+            display: none;
+        }
+
+        .emoji-wrapper.shown span {
+            display: inline-block;
             margin: 0 5px;
         }
 
-        ul#discussion li {
-            margin-bottom: 10px;
-        }
-
-        ul#discussion div {
-            display: inline-block;
-            margin-left: 10px;
+        .plus-sign {
+            cursor: pointer;
+            font-size: 20px; /* Adjust as needed */
+            font-weight: bold;
+            margin-left: 5px;
         }
     </style>
 </head>
@@ -32,60 +40,63 @@
         <input type="button" id="sendmessage" value="Send" />
         <ul id="discussion"></ul>
     </div>
-    <!--Script references. -->
-    <!--Reference the SignalR library. -->
     <script type="text/javascript" src="lib/signalr.min.js"></script>
-    <!--Add script to update the page and send messages.-->
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function () {
-
             var messageInput = document.getElementById('message');
 
-            // Get the user name and store it to prepend to messages.
             var name = prompt('Enter your name:', '');
-            // Set initial focus to message input box.
             messageInput.focus();
 
-            // Start the connection.
             var connection = new signalR.HubConnectionBuilder()
                 .withUrl('/chat')
                 .build();
 
-            // Create a function that the hub can call to broadcast messages.
-            connection.on('broadcastMessage', function (name, message) {
-                // Html encode display name and message.
+            connection.on('broadcastMessage', function (name, message, messageId) {
                 var encodedName = name;
                 var encodedMsg = message;
-                // Add the message to the page.
+
                 var liElement = document.createElement('li');
                 liElement.innerHTML = '<strong>' + encodedName + '</strong>:&nbsp;&nbsp;' + encodedMsg;
 
-                //Emojis
+                var plusSign = document.createElement('span');
+                plusSign.textContent = '+';
+                plusSign.className = 'plus-sign';
+
                 var emojiWrapper = document.createElement('div');
-                var emojis = ['&#128512;', '&#127789;', '&#128578;']; // Add more emojis if you want.
+                emojiWrapper.className = 'emoji-wrapper';
+
+                var emojis = ['&#128512;', '&#127789;', '&#128578;'];
                 emojis.forEach(function (emojiCode) {
                     var emoji = document.createElement('span');
                     emoji.innerHTML = emojiCode;
-                    emoji.style.cursor = 'pointer';
+                    emoji.className = 'emoji-reaction';
                     emoji.addEventListener('click', function () {
-                        emojiWrapper.innerHTML = emojiCode; // Show only the clicked emoji.
+                        emojiWrapper.innerHTML = emojiCode;
+                        plusSign.style.display = 'none';
                     });
                     emojiWrapper.appendChild(emoji);
                 });
 
+                plusSign.addEventListener('click', function () {
+                    emojiWrapper.classList.add('shown');
+                });
+
+                liElement.appendChild(plusSign);
                 liElement.appendChild(emojiWrapper);
                 document.getElementById('discussion').appendChild(liElement);
             });
 
-            // Transport fallback functionality is now built into start.
+            connection.on('updateReactions', function (messageId, emoji, count) {
+                // This method will be called whenever a new reaction is added.
+                // You can use the messageId, emoji, and count to update the reactions on the frontend.
+            });
+
             connection.start()
                 .then(function () {
                     console.log('connection started');
                     document.getElementById('sendmessage').addEventListener('click', function (event) {
-                        // Call the Send method on the hub.
-                        connection.invoke('send', name, messageInput.value);
-
-                        // Clear text box and reset focus for next comment.
+                        connection.invoke('SendMessage', name, messageInput.value);
                         messageInput.value = '';
                         messageInput.focus();
                         event.preventDefault();
