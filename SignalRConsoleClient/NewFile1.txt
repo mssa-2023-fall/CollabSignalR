@@ -1,0 +1,6 @@
+﻿
+
+
+var hubConnection = new HubConnectionBuilder()
+    .WithUrl("http://your-signalr-hub-url")
+    .Build();
