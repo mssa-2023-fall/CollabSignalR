@@ -1,118 +1,164 @@
 ﻿<!DOCTYPE html>
- <!-- Specifies the document type to be HTML5 -->
 <html>
 
 <head>
-    <title>SignalR Simple Chat</title> <!-- Sets the title of the page shown in the browser tab -->
+    <title>SignalR Simple Chat</title>
     <style type="text/css">
-        <!--
-
-        Beginning of internal CSS -->
         .container {
-            background-color: #99CCFF; /* Sets the background color of the container */
-            border: thick solid #808080; /* Sets the border thickness, style, and color */
-            padding: 20px; /* Adds padding inside the container */
-            margin: 20px; /* Adds margin outside the container */
+            background-color: #99CCFF;
+            border: thick solid #808080;
+            padding: 20px;
+            margin: 20px;
         }
 
         .emoji-reaction {
-            display: none; /* Hides the emoji-reaction by default */
-            cursor: pointer; /* Changes the cursor to a hand when hovered over the emoji-reaction */
+            display: inline-block;
+            cursor: pointer;
         }
 
         .emoji-wrapper span {
-            display: none; /* Hides the emojis inside the emoji-wrapper by default */
+            display: none;
         }
 
         .emoji-wrapper.shown span {
-            display: inline-block; /* Shows the emojis inside the emoji-wrapper when the "shown" class is added */
-            margin: 0 5px; /* Adds margin to the left and right of each emoji */
+            display: inline-block;
+            margin: 0 5px;
         }
 
         .plus-sign {
-            cursor: pointer; /* Changes the cursor to a hand when hovered over the plus-sign */
-            font-size: 20px; /* Sets the font size of the plus sign */
-            font-weight: bold; /* Makes the plus sign bold */
-            margin-left: 5px; /* Adds margin to the left of the plus sign */
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            margin-left: 5px;
         }
-    </style> <!-- End of internal CSS -->
+    </style>
 </head>
 
 <body>
     <div class="container">
-        <!-- Main container div -->
-        <input type="text" id="message" /> <!-- Input field for users to type their message -->
-        <input type="button" id="sendmessage" value="Send" /> <!-- Button to send the message -->
-        <ul id="discussion"></ul> <!-- Unordered list to display chat messages -->
+        <input type="text" id="message" />
+        <input type="button" id="sendmessage" value="Send" />
+        <ul id="discussion"></ul>
     </div>
-    <script type="text/javascript" src="lib/signalr.min.js"></script> <!-- Includes the SignalR library -->
+    <script type="text/javascript" src="lib/signalr.min.js"></script>
     <script type="text/javascript">
- <!-- Beginning of internal JavaScript-- >
-                document.addEventListener('DOMContentLoaded', function () { // Waits for the document to be fully loaded
-                    var messageInput = document.getElementById('message'); // Gets the message input element
+        // Wait for the document to fully load before running the script
+        document.addEventListener('DOMContentLoaded', function () {
 
-                    var name = prompt('Enter your name:', ''); // Prompts user for their name
-                    messageInput.focus(); // Puts focus on the message input field
+            // Get the message input box and store it in a variable
+            var messageInput = document.getElementById('message');
 
-                    var connection = new signalR.HubConnectionBuilder() // Initializes a new SignalR connection
-                        .withUrl('/chat') // Specifies the endpoint for the SignalR hub
-                        .build();
+            // Prompt the user to enter their name
+            var name = prompt('Enter your name:', '');
 
-                    connection.on('broadcastMessage', function (name, message, messageid) { // Listens for "broadcastMessage" events from the server
-                        var encodedName = name; // Stores the sender's name
-                        var encodedMsg = message; // Stores the received message
+            // Focus the message input box to make it ready for typing
+            messageInput.focus();
 
-                        var liElement = document.createElement('li'); // Creates a new list item element
-                        liElement.innerHTML = '<strong>' + encodedName + '</strong>:&nbsp;&nbsp;' + encodedMsg; // Sets the inner HTML of the list item
+            // Initialize a new SignalR connection to the server at the given URL
+            var connection = new signalR.HubConnectionBuilder()
+                .withUrl('/chat')
+                .build();
 
-                        var plusSign = document.createElement('span'); // Creates a new span element for the plus sign
-                        plusSign.textContent = '+'; // Sets the text content of the span to a plus sign
-                        plusSign.className = 'plus-sign'; // Adds the 'plus-sign' class to the span
+            // Define how the client should respond when a "broadcastMessage" is received from the server
+            connection.on('broadcastMessage', function (user, messageText, messageId) {
 
-                        var emojiWrapper = document.createElement('div'); // Creates a new div for the emoji wrapper
-                        emojiWrapper.className = 'emoji-wrapper'; // Adds the 'emoji-wrapper' class to the div
+                // Store the username and the message text received from the server
+                var encodedName = user;
+                var encodedMsg = messageText;
 
-                        var emojis = ['&#128512;', '&#127789;', '&#128578;']; // Array of emoji HTML entities
-                        emojis.forEach(function (emojiCode) { // Loops through each emoji
-                            var emoji = document.createElement('span'); // Creates a new span for each emoji
-                            emoji.innerHTML = emojiCode; // Sets the emoji HTML entity as the inner HTML of the span
-                            emoji.className = 'emoji-reaction'; // Adds the 'emoji-reaction' class to the span
-                            emoji.addEventListener('click', function () { // Adds a click event listener to the emoji span
-                                emojiWrapper.innerHTML = emojiCode; // Sets the clicked emoji as the only emoji in the emoji wrapper
-                                plusSign.style.display = 'none'; // Hides the plus sign
-                            });
-                            emojiWrapper.appendChild(emoji); // Appends the emoji span to the emoji wrapper
-                        });
+                // Create a new list item element to display the message
+                var liElement = document.createElement('li');
 
-                        plusSign.addEventListener('click', function () { // Adds a click event listener to the plus sign
-                            emojiWrapper.classList.add('shown'); // Adds the 'shown' class to the emoji wrapper, making the emojis visible
-                        });
+                // Set the inner content of the list item element with the username and message text
+                liElement.innerHTML = '<strong>' + encodedName + '</strong>:&nbsp;&nbsp;' + encodedMsg;
 
-                        liElement.appendChild(plusSign); // Appends the plus sign to the list item
-                        liElement.appendChild(emojiWrapper); // Appends the emoji wrapper to the list item
-                        document.getElementById('discussion').appendChild(liElement); // Appends the list item to the discussion list
+                // Store the messageId on the list item for later use
+                liElement.setAttribute('data-message-id', messageId);
+
+                // Create a new span element for the "+" sign (to show emoji reactions when clicked)
+                var plusSign = document.createElement('span');
+                plusSign.textContent = '+';
+                plusSign.className = 'plus-sign';
+
+                // Create a container for the emoji reactions
+                var emojiWrapper = document.createElement('div');
+                emojiWrapper.className = 'emoji-wrapper';
+
+                // Define the emoji reactions available
+                var emojis = ['&#128512;', '&#127789;', '&#128578;'];
+
+                // For each emoji, create a clickable element and add event listeners
+                emojis.forEach(function (emojiCode) {
+                    var emoji = document.createElement('span');
+                    emoji.innerHTML = emojiCode;
+                    emoji.className = 'emoji-reaction';
+
+                    // When an emoji is clicked, send a reaction to the server
+                    emoji.addEventListener('click', function () {
+                        emojiWrapper.innerHTML = emojiCode;
+                        connection.invoke('AddEmojiCount', name, emojiCode, messageId);
+                        plusSign.style.display = 'none';
                     });
-
-                    connection.on('updateReactions', function (messageId, emoji, count) {
-                        // This method will be called whenever a new reaction is added.
-                        // You can use the messageId, emoji, and count to update the reactions on the frontend.
-                    });
-
-                    connection.start() // Starts the SignalR connection
-                        .then(function () {
-                            console.log('connection started'); // Logs to the console when the connection has started
-                            document.getElementById('sendmessage').addEventListener('click', function (event) { // Adds a click event listener to the send button
-                                connection.invoke('SendMessage', name, messageInput.value); // Sends a message to the server using the 'SendMessage' method
-                                messageInput.value = ''; // Clears the message input field
-                                messageInput.focus(); // Puts focus back on the message input field
-                                event.preventDefault(); // Prevents the default behavior of the click event
-                            });
-                        })
-                        .catch(error => {
-                            console.error(error.message); // Logs any errors that occur when trying to start the connection
-                        });
+                    emojiWrapper.appendChild(emoji);
                 });
-    </script> <!-- End of internal JavaScript -->
+
+                // Show emoji reactions when the "+" sign is clicked
+                plusSign.addEventListener('click', function () {
+                    emojiWrapper.classList.add('shown');
+                });
+
+                // Append the "+" sign and emoji wrapper to the list item
+                liElement.appendChild(plusSign);
+                liElement.appendChild(emojiWrapper);
+
+                // Append the list item to the "discussion" list
+                document.getElementById('discussion').appendChild(liElement);
+            });
+
+            // Define how the client should respond when an "updateReactions" message is received from the server
+            connection.on('updateReactions', function (messageId, emoji, count) {
+
+                // Find the list item associated with the given messageId
+                var messageElement = document.querySelector('li[data-message-id="' + messageId + '"]');
+
+                if (!messageElement) return;
+
+                // Find the emoji reaction inside the list item
+                var emojiElement = messageElement.querySelector('span.emoji-reaction:contains("' + emoji + '")');
+
+                if (!emojiElement) {
+                    // If the emoji reaction doesn't exist yet, create it
+                    emojiElement = document.createElement('span');
+                    emojiElement.innerHTML = emoji + " " + count;
+                    emojiElement.className = 'emoji-reaction';
+
+                    // Append the emoji reaction to the list item
+                    var emojiWrapper = messageElement.querySelector('.emoji-wrapper');
+                    emojiWrapper.appendChild(emojiElement);
+                } else {
+                    // If the emoji reaction already exists, update its count
+                    emojiElement.innerHTML = emoji + " " + count;
+                }
+            });
+
+            // Start the SignalR connection
+            connection.start()
+                .then(function () {
+                    console.log('connection started');
+
+                    // When the "Send" button is clicked, send the message to the server
+                    document.getElementById('sendmessage').addEventListener('click', function (event) {
+                        connection.invoke('SendMessage', name, messageInput.value);
+                        messageInput.value = '';
+                        messageInput.focus();
+                        event.preventDefault();
+                    });
+                })
+                .catch(error => {
+                    console.error(error.message);
+                });
+        });
+    </script>
 </body>
 
 </html>
