@@ -1,5 +1,7 @@
 name: Build and deploy .NET Core application to Web App ChatSample20231024085542
 on:
+  workflow_dispatch:
+
   push:
     paths:
       - 'ChatSample/**'
