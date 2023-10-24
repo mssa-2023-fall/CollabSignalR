@@ -54,7 +54,7 @@
                     emoji.style.cursor = 'pointer';
                     emoji.addEventListener('click', function () {
                         emojiWrapper.innerHTML = emojiCode; // Show only the clicked emoji.
-                        connection.invoke('AddEmojiCount', name, emojiCode, message);
+                        connection.invoke('AddEmojiCountAsync', name, emojiCode, message);
                     });
                     emojiWrapper.appendChild(emoji);
                 });
