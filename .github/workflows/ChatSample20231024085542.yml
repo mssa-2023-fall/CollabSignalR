@@ -1,6 +1,8 @@
 name: Build and deploy .NET Core application to Web App ChatSample20231024085542
 on:
   push:
+    paths:
+      - 'ChatSample/**'
     branches:
     - main
 env:
@@ -8,7 +10,7 @@ env:
   AZURE_WEBAPP_PACKAGE_PATH: .\published
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 5.0.x
-  WORKING_DIRECTORY: .
+  WORKING_DIRECTORY: .\ChatSample
 jobs:
   build:
     runs-on: windows-latest
