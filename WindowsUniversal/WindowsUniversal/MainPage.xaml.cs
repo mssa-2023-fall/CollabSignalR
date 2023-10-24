@@ -46,10 +46,10 @@ namespace WindowsUniversal
                     })
                     .Build();
 
-                _connection.On<string>("Send", s =>
+                _connection.On<string,string>("broadcastMessage", (name, msg) =>
                 {
                     // We don't need to actually wait for this, we're done after kicking this off.
-                    _ = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => AppendMessage(s));
+                    _ = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => AppendMessage($"{name}:{msg}"));
                 });
 
                 await _connection.StartAsync();
@@ -83,7 +83,7 @@ namespace WindowsUniversal
         {
             try
             {
-                await _connection.InvokeAsync("Send", MessageTextBox.Text);
+                await _connection.InvokeAsync("Send", "UwpApp", MessageTextBox.Text);
             }
             catch (Exception ex)
             {
