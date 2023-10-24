@@ -30,8 +30,8 @@
             var name = prompt('Enter your name:', '');
                         
             //stops injections in the name
-            while (name.length > 15 || name.length < 3 || !(/^[a-zA-Z]*$/.test(name))) {
-                alert("Invalid name try again!");
+            while (name.length > 15 || name.length < 3 || !(/^[^<>]+$/.test(name))) {
+                alert("Invalid name, must be between 15 and 3 characters long, no < or > allowed, try again!");
                 name = prompt('Enter your name:', '');
             }
             // Set initial focus to message input box.
