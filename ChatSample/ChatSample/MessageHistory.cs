@@ -7,13 +7,13 @@ namespace ChatSample
     internal static class MessageHistory
     {
         static object locker=new object();
-        internal readonly static SortedList<Message, Message> messages;
-        private static SortedList<Message, Message> _messages = new SortedList<Message, Message>();
+        internal readonly static SortedList<History.Message, History.Message> messages;
+        private static SortedList<History.Message, History.Message> _messages = new SortedList<History.Message, History.Message>();
         static MessageHistory()
         {
             messages = _messages;
         }
-        internal static void Add(Message message)
+        internal static void Add(History.Message message)
         {
             lock(locker) {
                 _messages.Add(message, message);

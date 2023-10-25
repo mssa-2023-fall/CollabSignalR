@@ -18,3 +18,6 @@ namespace ChatSample
                 });
     }
 }
+//Store messages as they come in
+//Create all rewrite all
+//A way to update them

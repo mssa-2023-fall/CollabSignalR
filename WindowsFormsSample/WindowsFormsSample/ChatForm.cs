@@ -1,6 +1,9 @@
 using System;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using System.Xml.Linq;
+using ChatSample;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace WindowsFormsSample
@@ -33,6 +36,8 @@ namespace WindowsFormsSample
                 .Build();
 
             _connection.On<string, string>("broadcastMessage", (s1, s2) => OnSend(s1, s2));
+            _connection.On<ChatSample.Message>("BroadcastReactionSupportedMessage", (s1) => OnReactionSupportedSend(s1));
+
 
             Log(Color.Gray, "Starting connection...");
             try
@@ -50,6 +55,18 @@ namespace WindowsFormsSample
             UpdateState(connected: true);
 
             messageTextBox.Focus();
+        }
+
+        private void OnReactionSupportedSend(ChatSample.Message message) {
+            Log(Color.Black, message.Creator + ": " + message.Text);
+        }
+
+        private void ReactionSupportedLog() {
+            Action callback = () => {
+                messagesList.Items.Add(new ChatSample.Message());
+            };
+
+            Invoke(callback);
         }
 
         private async void disconnectButton_Click(object sender, EventArgs e)
@@ -78,12 +95,13 @@ namespace WindowsFormsSample
         {
             try
             {
-                await _connection.InvokeAsync("Send", "WinFormsApp", messageTextBox.Text);
+                await _connection.InvokeAsync("Send", nameTextBox.Text, messageTextBox.Text);
             }
             catch (Exception ex)
             {
                 Log(Color.Red, ex.ToString());
             }
+            messageTextBox.Clear();
         }
 
         private void UpdateState(bool connected)
@@ -114,7 +132,6 @@ namespace WindowsFormsSample
         private class LogMessage
         {
             public Color MessageColor { get; }
-
             public string Content { get; }
 
             public LogMessage(Color messageColor, string content)
@@ -126,12 +143,40 @@ namespace WindowsFormsSample
 
         private void messagesList_DrawItem(object sender, DrawItemEventArgs e)
         {
+            if (e.Index < 0 || e.Index >= messagesList.Items.Count) return;
+            
+            // message = name + : + actual message
             var message = (LogMessage)messagesList.Items[e.Index];
+#pragma warning disable CA1416
             e.Graphics.DrawString(
                 message.Content,
                 messagesList.Font,
-                new SolidBrush(message.MessageColor),
+                new SolidBrush(Color.Black),
                 e.Bounds);
+#pragma warning restore CA1416
         }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void emojiButton_Click(object sender, EventArgs e)
+        {
+            // Simulate pressing Win+Period
+            keybd_event(VK_LWIN, 0, 0, IntPtr.Zero);
+            keybd_event(VK_OEM_PERIOD, 0, 0, IntPtr.Zero);
+            keybd_event(VK_OEM_PERIOD, 0, KEYEVENTF_KEYUP, IntPtr.Zero);
+            keybd_event(VK_LWIN, 0, KEYEVENTF_KEYUP, IntPtr.Zero);
+
+            messageTextBox.Focus();
+        }
+
+        [DllImport("user32.dll")]
+        public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, IntPtr dwExtraInfo);
+
+        private const byte VK_LWIN = 0x5B; // Left Windows key
+        private const byte VK_OEM_PERIOD = 0xBE; // Period key
+        private const int KEYEVENTF_KEYUP = 0x0002;
     }
 }
