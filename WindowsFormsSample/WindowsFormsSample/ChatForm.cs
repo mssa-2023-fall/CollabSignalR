@@ -85,6 +85,7 @@ namespace WindowsFormsSample
             {
                 Log(Color.Red, ex.ToString());
             }
+            messageTextBox.Clear();
         }
 
         private void UpdateState(bool connected)
