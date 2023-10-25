@@ -27,13 +27,13 @@
             var messageInput = document.getElementById('message');
 
             // Get the user name and store it to prepend to messages.
-            var name = prompt('Enter your name:', '');
+            var name = prompt('Enter your name:', '').trim();
                         
             //stops injections in the name look 
             //look into github.com/cure53/DOMPurify
             while (name.length > 15 || name.length < 3 || !(/^[^<>]+$/.test(name))) {
                 alert("Invalid name, must be between 15 and 3 characters long, no < or > allowed, try again!");
-                name = prompt('Enter your name:', '');
+                name = prompt('Enter your name:', '').trim();
             }
             // Set initial focus to message input box.
             messageInput.focus();
