@@ -126,6 +126,8 @@ namespace WindowsFormsSample
 
         private void messagesList_DrawItem(object sender, DrawItemEventArgs e)
         {
+            if (e.Index < 0 || e.Index >= messagesList.Items.Count) return;
+
             var message = (LogMessage)messagesList.Items[e.Index];
             e.Graphics.DrawString(
                 message.Content,
