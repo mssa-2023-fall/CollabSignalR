@@ -42,7 +42,7 @@ namespace ChatSample.Hubs
             // If the message exists
             if (message != null)
             {
-                // Find the reaction with the given emoji for the message
+                // Find the reaction with the given emoji for the message test
                 var reaction = message.Reactions.FirstOrDefault(r => r.Emoji == emoji);
 
                 // If the reaction doesn't exist
