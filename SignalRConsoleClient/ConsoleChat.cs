@@ -3,24 +3,51 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Spectre;
+using System.Web.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Configuration;
+using Spectre.Console;
 
 namespace SignalRConsoleClient
 {
+    public class HomeController : Controller
+    {
+        private readonly IConfiguration _configuration;
+
+        public HomeController(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        public IActionResult Index()
+        {
+            var apiKey = _configuration["MyApiSettings:ApiKey"];
+            return (IActionResult)Content($"API Key: {apiKey}");
+        }
+    }
     public class ConsoleChat
     {
         private HubConnection _connection { get; set; }
 
         public ConsoleChat()
         {
+            var configuration = new ConfigurationBuilder()
+            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+            .AddUserSecrets<Program>()
+            .Build();
+
+            var apiKey = configuration["MyApiSettings:ApiKey"];
+
             _connection = new HubConnectionBuilder()
-                          .WithUrl("https://chatsample20231024085542.azurewebsites.net/chat")
+                          .WithUrl($"{apiKey}")
                           .Build();
         }
         public void Intro()
         {
-            Console.WriteLine("Welcome to the NerdCraft Chat");
-            Console.WriteLine("Press ESC key to continue");
+            AnsiConsole.MarkupLine("[blue]Welcome to the NerdCraft Chat[/]");
+            AnsiConsole.MarkupLine("[yellow]Press ESC key to continue[/]");
             Console.CursorVisible = false; // Hide the cursor
 
             int screenWidth = Console.WindowWidth;
@@ -50,7 +77,7 @@ namespace SignalRConsoleClient
             while (!exitRequested)
             {
                 Console.SetCursorPosition(position, Console.WindowHeight / 2);
-                Console.Write(hotdog);
+                AnsiConsole.MarkupLine($"[yellow]{hotdog}[/]");
                 Thread.Sleep(animationSpeed);
                 Console.SetCursorPosition(position, Console.WindowHeight / 2);
                 Console.Write(new string(' ', hotdog.Length));
@@ -68,8 +95,8 @@ namespace SignalRConsoleClient
             try
             {
                 await _connection.StartAsync();
-                Console.WriteLine("Connection established.");
-                Console.WriteLine("Type Exit to exit the chat.");
+                AnsiConsole.MarkupLine("[green]Connection established.[/]");
+                AnsiConsole.MarkupLine("[yellow]Type Exit to exit the chat.[/]");
             }
             catch (Exception ex)
             {
@@ -85,7 +112,7 @@ namespace SignalRConsoleClient
 
             _connection.On<string, string>("broadcastMessage", (user, message) =>
             {
-                Console.WriteLine($"{user}: {message}");
+                AnsiConsole.MarkupLine($"\n\r[blue]{user}: {message}[/]");
             });
 
             while (true)
