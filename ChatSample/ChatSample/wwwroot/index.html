@@ -1,11 +1,8 @@
 ﻿<!DOCTYPE html>
 <html>
-
 <head>
     <title>SignalR Simple Chat</title>
-    <!-- Styling for the chat application -->
     <style type="text/css">
-        /* Styling for the main chat container */
         .container {
             background-color: #99CCFF;
             border: thick solid #808080;
@@ -13,44 +10,28 @@
             margin: 20px;
         }
 
-<<<<<<< HEAD
         .emoji-reaction {
             display: none;
             cursor: pointer;
         }
 
-=======
-        /* Styling for the emoji reactions that users can click on */
-        .emoji-reaction {
+        .emoji-reaction,
+        .plus-sign {
             display: inline-block;
             cursor: pointer;
         }
 
-        /* By default, hide the emojis in the emoji wrapper */
->>>>>>> emojiDev_John
         .emoji-wrapper span {
             display: none;
-        }
-
-<<<<<<< HEAD
-=======
-        /* When the emoji wrapper is shown, display the emojis with some margin */
->>>>>>> emojiDev_John
-        .emoji-wrapper.shown span {
-            display: inline-block;
             margin: 0 5px;
         }
 
-<<<<<<< HEAD
+        .emoji-wrapper.shown span {
+            display: inline-block;
+        }
+
         .plus-sign {
-            cursor: pointer;
-            font-size: 20px; /* Adjust as needed */
-=======
-        /* Styling for the plus sign that users can click to show the emoji reactions */
-        .plus-sign {
-            cursor: pointer;
             font-size: 20px;
->>>>>>> emojiDev_John
             font-weight: bold;
             margin-left: 5px;
         }
@@ -58,26 +39,16 @@
 </head>
 
 <body>
-    <!-- Main chat container -->
     <div class="container">
-        <!-- Input field for users to type their messages -->
         <input type="text" id="message" />
-        <!-- Button to send the typed message -->
         <input type="button" id="sendmessage" value="Send" />
-        <!-- List to display the chat messages -->
         <ul id="discussion"></ul>
     </div>
-<<<<<<< HEAD
-=======
-    <!-- Including the SignalR library -->
->>>>>>> emojiDev_John
-    <script type="text/javascript" src="lib/signalr.min.js"></script>
-    <script type="text/javascript">
-        // Wait for the document to be fully loaded before executing the script
-        document.addEventListener('DOMContentLoaded', function () {
-<<<<<<< HEAD
-            var messageInput = document.getElementById('message');
 
+    <script src="lib/signalr.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var messageInput = document.getElementById('message');
             var name = prompt('Enter your name:', '');
             messageInput.focus();
 
@@ -85,73 +56,26 @@
                 .withUrl('/chat')
                 .build();
 
-            // SUPPORT FOR LEGACY MESSAGES
-            connection.on('broadcastMessage', function (name, message) {
-                // Html encode display name and message.
+            connection.on('broadcastMessage', function (name, message, messageId) {
                 var encodedName = name;
                 var encodedMsg = message;
-
                 var liElement = document.createElement('li');
                 liElement.innerHTML = '<strong>' + encodedName + '</strong>:&nbsp;&nbsp;' + encodedMsg;
-
-=======
-            // Log that the script has started executing
-            console.log("Script loaded and DOMContentLoaded event triggered.");
-
-            // Get the message input field and store it in a variable
-            var messageInput = document.getElementById('message');
-            // Prompt the user to enter their name
-            var name = prompt('Enter your name:', '');
-            // Focus on the message input field
-            messageInput.focus();
-
-            // Create an array to store messages locally
-            var storedMessages = [];
-
-            // Initialize the SignalR connection
-            var connection = new signalR.HubConnectionBuilder()
-                .withUrl('/chat') // Set the URL for the SignalR hub
-                .build();
-
-            // Listen for the 'broadcastMessage' event from the server
-            connection.on('broadcastMessage', function (user, messageText, messageId) {
-                // Log the received message details
-                console.log(`Received broadcastMessage: User=${user}, MessageText=${messageText}, MessageId=${messageId}`);
-
-                // Store the received message in the local array
-                storedMessages.push({ name: user, message: messageText });
-
-                // Create a list item element to display the received message
-                var liElement = document.createElement('li');
-                liElement.innerHTML = '<strong>' + user + '</strong>:&nbsp;&nbsp;' + messageText;
                 liElement.setAttribute('data-message-id', messageId);
 
-                // Create a plus sign element to show the emoji reactions
->>>>>>> emojiDev_John
                 var plusSign = document.createElement('span');
                 plusSign.textContent = '+';
                 plusSign.className = 'plus-sign';
 
-<<<<<<< HEAD
                 var emojiWrapper = document.createElement('div');
                 emojiWrapper.className = 'emoji-wrapper';
 
                 var emojis = ['&#128512;', '&#127789;', '&#128578;'];
-=======
-                // Create a wrapper for the emoji reactions
-                var emojiWrapper = document.createElement('div');
-                emojiWrapper.className = 'emoji-wrapper';
 
-                // Define the emojis that can be used as reactions
-                var emojis = ['&#128512;', '&#127789;', '&#128578;'];
-
-                // For each emoji, create a span element and add an event listener
->>>>>>> emojiDev_John
                 emojis.forEach(function (emojiCode) {
                     var emoji = document.createElement('span');
                     emoji.innerHTML = emojiCode;
                     emoji.className = 'emoji-reaction';
-<<<<<<< HEAD
                     emoji.addEventListener('click', function () {
                         emojiWrapper.innerHTML = emojiCode;
                         plusSign.style.display = 'none';
@@ -159,137 +83,31 @@
                     emojiWrapper.appendChild(emoji);
                 });
 
-=======
-
-                    // When an emoji is clicked, invoke the 'AddReaction' method on the server
-                    emoji.addEventListener('click', function () {
-                        connection.invoke('AddReaction', messageId, emoji.innerHTML, name);
-                        plusSign.style.display = 'none'; // Hide the plus sign after selecting an emoji
-                    });
-                    emojiWrapper.appendChild(emoji); // Add the emoji to the emoji wrapper
-                });
-
-                // When the plus sign is clicked, show the emoji reactions
->>>>>>> emojiDev_John
                 plusSign.addEventListener('click', function () {
                     emojiWrapper.classList.add('shown');
                 });
 
-<<<<<<< HEAD
                 liElement.appendChild(plusSign);
                 liElement.appendChild(emojiWrapper);
                 document.getElementById('discussion').appendChild(liElement);
             });
 
-            // Create a function that the hub can call to broadcast messages.
-            connection.on('BroadcastReactionSupportedMessage', function (message) {
-                // Html encode display name and message.
-                var encodedName = message.creator;
-                var encodedMsg = message.text;
-                // Add the message to the page.
-                var liElement = document.createElement('li');
-                liElement.innerHTML = '<strong>' + encodedName + '</strong>:&nbsp;&nbsp;' + encodedMsg;
-
-                //Emojis
-                var emojiWrapper = document.createElement('div');
-                var emojis = ['&#128512;', '&#127789;', '&#128578;']; // Add more emojis if you want.
-                emojis.forEach(function (emojiCode) {
-                    var emoji = document.createElement('span');
-                    emoji.innerHTML = emojiCode;
-                    emoji.style.cursor = 'pointer';
-                    emoji.addEventListener('click', function () {
-                        emojiWrapper.innerHTML = emojiCode; // Show only the clicked emoji.
-                        connection.invoke('AddEmojiCountAsync', name, emojiCode, message);
-                    });
-                    emojiWrapper.appendChild(emoji);
-                });
-
-                liElement.appendChild(emojiWrapper);
-                document.getElementById('discussion').appendChild(liElement);
-            });
-
-            connection.on('UpdateMessageReactions', function (messageID, messageReactions) {
-                console.log(messageReactions)
-                // need to have a place with all the messages
-                // need to be able to change those messages
-            });
-            
-            // Transport fallback functionality is now built into start.
-=======
-                // Add the plus sign and emoji wrapper to the list item
-                liElement.appendChild(plusSign);
-                liElement.appendChild(emojiWrapper);
-
-                // Add the list item to the chat discussion list
-                document.getElementById('discussion').appendChild(liElement);
-            });
-
-            // Listen for the 'updateReactions' event from the server
-            connection.on('updateReactions', function (messageId, emoji, count) {
-                // Log the received reaction update details
-                console.log(`Received updateReactions: MessageId=${messageId}, Emoji=${emoji}, Count=${count}`);
-
-                // Find the message element that corresponds to the messageId
-                var messageElement = document.querySelector('li[data-message-id="' + messageId + '"]');
-                if (!messageElement) return;
-
-                // Find the emoji element within the message that matches the received emoji
-                var emojiElement = Array.from(messageElement.querySelectorAll('span.emoji-reaction')).find(e => e.innerHTML.includes(emoji));
-                console.log(emojiElement.innerHTML);
-
-                // If the emoji element doesn't exist, create it
-                if (!emojiElement) {
-                    emojiElement = document.createElement('span');
-                    emojiElement.innerHTML = emoji + " " + count;
-                    emojiElement.className = 'emoji-reaction';
-
-                    var emojiWrapper = messageElement.querySelector('.emoji-wrapper');
-                    emojiWrapper.appendChild(emojiElement);
-                } else {
-                    // If the emoji element exists, update its count
-                    emojiElement.innerHTML = emoji + " " + count;
-                }
-            });
-
-            // Start the SignalR connection
->>>>>>> emojiDev_John
             connection.start()
                 .then(function () {
-                    // Log that the connection has started
                     console.log('connection started');
-<<<<<<< HEAD
-                    document.getElementById('sendmessage').addEventListener('click', function (event) {
-                        // Call the Send method on the hub.
-                        connection.invoke('SendReactionSupported', name, messageInput.value);
-=======
->>>>>>> emojiDev_John
 
-                    // Add an event listener to the send message button
                     document.getElementById('sendmessage').addEventListener('click', function (event) {
-                        // Invoke the 'SendMessage' method on the server when the button is clicked
-                        connection.invoke('SendMessage', name, messageInput.value);
-                        // Clear the message input field and refocus on it
+                        connection.invoke('SendReactionSupported', name, messageInput.value);
                         messageInput.value = '';
                         messageInput.focus();
-                        event.preventDefault(); // Prevent the default form submission behavior
+                        event.preventDefault();
                     });
                 })
                 .catch(error => {
-<<<<<<< HEAD
                     console.error(error.message);
-=======
-                    // Log any errors that occur while starting the connection
                     console.error('Error starting connection:', error.message);
->>>>>>> emojiDev_John
                 });
         });
     </script>
 </body>
-
-<<<<<<< HEAD
 </html>
-=======
-</html>
-
-
->>>>>>> emojiDev_John

@@ -6,116 +6,99 @@ using System.Threading.Tasks;
 
 namespace ChatSample.Hubs
 {
-    // Define the ChatHub class which inherits from the SignalR Hub class
     public class ChatHub : Hub
     {
-        public async Task Send(string name, string message)
-        {
-            // Call the broadcastMessage method to update clients.
-            await Clients.All.SendAsync("broadcastMessage", name, message);
-        }
-        // Static list to store messages for all connected clients
         private static List<Message> Messages = new List<Message>();
 
-        // Asynchronous method to send a message
+        public async Task Send(string name, string message)
+        {
+            await Clients.All.SendAsync("broadcastMessage", name, message);
+        }
+
         public async Task SendMessage(string user, string messageText)
         {
-            // Create a new message object
             var message = new Message
             {
-                ID = System.Guid.NewGuid().ToString(), // Assign a unique ID to the message
-                Creator = user, // Set the creator of the message
-                Text = messageText // Set the text of the message
+                ID = Guid.NewGuid().ToString(),
+                Creator = user,
+                Text = messageText
             };
 
-            // Add the created message to the list of messages
             Messages.Add(message);
 
-            // Broadcast the message to all connected clients
             await Clients.All.SendAsync("broadcastMessage", user, message.Text, message.ID);
         }
 
-        // Asynchronous method to add a reaction to a message
         public async Task AddReaction(string messageId, string emoji, string user)
         {
-            // Log the reaction details for debugging purposes
             Console.WriteLine($"Adding reaction: MessageId={messageId}, Emoji={emoji}, User={user}");
 
-            // Find the message with the given ID
             var message = Messages.FirstOrDefault(m => m.ID == messageId);
 
-            // If the message exists
             if (message != null)
             {
-                // Find the reaction with the given emoji for the message
                 var reaction = message.Reactions.FirstOrDefault(r => r.Emoji == emoji);
 
-                // If the reaction doesn't exist
                 if (reaction == null)
                 {
-                    // Create a new reaction object
                     reaction = new Reaction
                     {
                         Emoji = emoji
                     };
 
-                    // Add the created reaction to the message's reactions list
                     message.Reactions.Add(reaction);
                 }
 
-                // If the user has already reacted with this emoji
                 if (reaction.UsersReacted.Contains(user))
                 {
-                    // Remove the user from the list of users who reacted with this emoji
                     reaction.UsersReacted.Remove(user);
                 }
                 else
                 {
-                    // Add the user to the list of users who reacted with this emoji
                     reaction.UsersReacted.Add(user);
                 }
 
-                // Broadcast the updated reaction count to all connected clients
                 await Clients.All.SendAsync("updateReactions", messageId, emoji, reaction.Count);
 
-                // Log the updated reaction count for debugging purposes
                 Console.WriteLine($"Sending count {reaction.Count} for emoji {emoji} for message {messageId}");
             }
         }
 
-        public async Task SendReactionSupported(string usersName, string usersText) {
-            Message message = new Message() {
+        public async Task SendReactionSupported(string usersName, string usersText)
+        {
+            var message = new Message
+            {
                 Creator = usersName,
                 Text = usersText
             };
-            // Call the broadcastMessage method to update clients.
 
             await Clients.All.SendAsync("BroadcastReactionSupportedMessage", message);
         }
 
-        public async Task AddEmojiCountAsync(string usersName, string emojiValue, Message message) {
-            // if not already in reactions add it
-            if (!message.Reactions.Any(x => x.Emoji == emojiValue)) {
-                message.Reactions.Add(new Reaction() { Emoji = emojiValue, Count = 0 });
+        public async Task AddEmojiCountAsync(string usersName, string emojiValue, Message message)
+        {
+            if (!message.Reactions.Any(x => x.Emoji == emojiValue))
+            {
+                message.Reactions.Add(new Reaction { Emoji = emojiValue, Count = 0 });
             }
-            foreach( var react in message.Reactions) {
-                Console.WriteLine(react);
-            }
-            // find reaction
-            var reactionIndex = message.Reactions.IndexOf(message.Reactions.Find(x => x.Emoji == emojiValue));
 
-            // if user already reacted this emoji remove it, else add
-            if (message.Reactions[reactionIndex].UsersReacted.Contains(usersName)) {
+            var reactionIndex = message.Reactions.FindIndex(x => x.Emoji == emojiValue);
+
+            if (message.Reactions[reactionIndex].UsersReacted.Contains(usersName))
+            {
                 message.Reactions[reactionIndex].UsersReacted.Remove(usersName);
                 message.Reactions[reactionIndex].Count--;
-                if (message.Reactions[reactionIndex].Count == 0) {
+
+                if (message.Reactions[reactionIndex].Count == 0)
+                {
                     message.Reactions.RemoveAt(reactionIndex);
                 }
-            } else {
+            }
+            else
+            {
                 message.Reactions[reactionIndex].Count++;
             }
 
-            // update everyones emoji count
             await Clients.All.SendAsync("UpdateMessageReactions", message.ID, message.Reactions);
         }
     }
