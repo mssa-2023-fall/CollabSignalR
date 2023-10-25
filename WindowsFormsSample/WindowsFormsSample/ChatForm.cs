@@ -147,11 +147,13 @@ namespace WindowsFormsSample
             
             // message = name + : + actual message
             var message = (LogMessage)messagesList.Items[e.Index];
+#pragma warning disable CA1416
             e.Graphics.DrawString(
                 message.Content,
                 messagesList.Font,
                 new SolidBrush(Color.Black),
                 e.Bounds);
+#pragma warning restore CA1416
         }
 
         private void label2_Click(object sender, EventArgs e)
