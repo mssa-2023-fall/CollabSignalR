@@ -141,14 +141,14 @@
                 // If the emoji element doesn't exist, create it
                 if (!emojiElement) {
                     emojiElement = document.createElement('span');
-                    emojiElement.innerHTML = emoji + " " + parseInt(count, 10);
+                    emojiElement.innerHTML = emoji + " " + count;
                     emojiElement.className = 'emoji-reaction';
 
                     var emojiWrapper = messageElement.querySelector('.emoji-wrapper');
                     emojiWrapper.appendChild(emojiElement);
                 } else {
                     // If the emoji element exists, update its count
-                    emojiElement.innerHTML = emoji + " " + parseInt(count, 10);
+                    emojiElement.innerHTML = emoji + " " + count;
                 }
             });
 
