@@ -32,7 +32,7 @@ namespace ChatSample.Hubs
 
         public int CompareTo(Message other)
         {
-            return this.Timestamp.CompareTo(other.Timestamp);
+            return -this.Timestamp.CompareTo(other.Timestamp);
         }
 
         public override string ToString()
