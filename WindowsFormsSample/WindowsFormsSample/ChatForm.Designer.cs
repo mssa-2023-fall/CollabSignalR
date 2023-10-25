@@ -37,6 +37,7 @@
             disconnectButton = new System.Windows.Forms.Button();
             label2 = new System.Windows.Forms.Label();
             nameTextBox = new System.Windows.Forms.TextBox();
+            button1 = new System.Windows.Forms.Button();
             SuspendLayout();
             // 
             // addressTextBox
@@ -101,10 +102,10 @@
             // 
             messageTextBox.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             messageTextBox.Enabled = false;
-            messageTextBox.Location = new System.Drawing.Point(18, 616);
+            messageTextBox.Location = new System.Drawing.Point(39, 616);
             messageTextBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             messageTextBox.Name = "messageTextBox";
-            messageTextBox.Size = new System.Drawing.Size(761, 23);
+            messageTextBox.Size = new System.Drawing.Size(740, 23);
             messageTextBox.TabIndex = 4;
             messageTextBox.Enter += messageTextBox_Enter;
             // 
@@ -140,11 +141,22 @@
             nameTextBox.Size = new System.Drawing.Size(607, 23);
             nameTextBox.TabIndex = 9;
             // 
+            // button1
+            // 
+            button1.Location = new System.Drawing.Point(10, 615);
+            button1.Name = "button1";
+            button1.Size = new System.Drawing.Size(22, 23);
+            button1.TabIndex = 10;
+            button1.Text = "😊";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += emojiButton_Click;
+            // 
             // ChatForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(888, 653);
+            Controls.Add(button1);
             Controls.Add(nameTextBox);
             Controls.Add(label2);
             Controls.Add(disconnectButton);
@@ -173,6 +185,7 @@
         private System.Windows.Forms.Button disconnectButton;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox nameTextBox;
+        private System.Windows.Forms.Button button1;
     }
 }
 
