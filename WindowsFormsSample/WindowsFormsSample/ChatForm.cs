@@ -1,6 +1,8 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Xml.Linq;
+using ChatSample;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace WindowsFormsSample
@@ -33,6 +35,8 @@ namespace WindowsFormsSample
                 .Build();
 
             _connection.On<string, string>("broadcastMessage", (s1, s2) => OnSend(s1, s2));
+            _connection.On<ChatSample.Message>("BroadcastReactionSupportedMessage", (s1) => OnReactionSupportedSend(s1));
+
 
             Log(Color.Gray, "Starting connection...");
             try
@@ -50,6 +54,18 @@ namespace WindowsFormsSample
             UpdateState(connected: true);
 
             messageTextBox.Focus();
+        }
+
+        private void OnReactionSupportedSend(ChatSample.Message message) {
+            Log(Color.Black, message.Creator + ": " + message.Text);
+        }
+
+        private void ReactionSupportedLog() {
+            Action callback = () => {
+                messagesList.Items.Add(new ChatSample.Message());
+            };
+
+            Invoke(callback);
         }
 
         private async void disconnectButton_Click(object sender, EventArgs e)
@@ -126,11 +142,12 @@ namespace WindowsFormsSample
 
         private void messagesList_DrawItem(object sender, DrawItemEventArgs e)
         {
+            // message = name + : + actual message
             var message = (LogMessage)messagesList.Items[e.Index];
             e.Graphics.DrawString(
                 message.Content,
                 messagesList.Font,
-                new SolidBrush(message.MessageColor),
+                new SolidBrush(Color.Black),
                 e.Bounds);
         }
 
