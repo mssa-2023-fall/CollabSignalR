@@ -78,7 +78,7 @@ namespace WindowsFormsSample
         {
             try
             {
-                await _connection.InvokeAsync("Send", "WinFormsApp", messageTextBox.Text);
+                await _connection.InvokeAsync("Send", nameTextBox.Text, messageTextBox.Text);
             }
             catch (Exception ex)
             {
@@ -132,6 +132,11 @@ namespace WindowsFormsSample
                 messagesList.Font,
                 new SolidBrush(message.MessageColor),
                 e.Bounds);
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
