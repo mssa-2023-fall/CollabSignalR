@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using System;
-<<<<<<< HEAD
-=======
 using System.Collections.Generic;
->>>>>>> emojiDev_John
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,11 +9,11 @@ namespace ChatSample.Hubs
     // Define the ChatHub class which inherits from the SignalR Hub class
     public class ChatHub : Hub
     {
-<<<<<<< HEAD
-        public async Task Send(string name, string message) {
+        public async Task Send(string name, string message)
+        {
             // Call the broadcastMessage method to update clients.
             await Clients.All.SendAsync("broadcastMessage", name, message);
-=======
+        }
         // Static list to store messages for all connected clients
         private static List<Message> Messages = new List<Message>();
 
@@ -84,7 +81,6 @@ namespace ChatSample.Hubs
                 // Log the updated reaction count for debugging purposes
                 Console.WriteLine($"Sending count {reaction.Count} for emoji {emoji} for message {messageId}");
             }
->>>>>>> emojiDev_John
         }
 
         public async Task SendReactionSupported(string usersName, string usersText) {
