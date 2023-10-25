@@ -51,7 +51,9 @@
                          
                 // Add the message to the page.
                 var liElement = document.createElement('li');
-                liElement.innerHTML = '<strong>' + encodedName + '</strong>:&nbsp;&nbsp;' + encodedMsg;
+                liElement.innerHTML = '<strong>' + encodedName + '</strong>:&nbsp;&nbsp;';
+                //Victor's recommendation...
+                liElement.innerText += encodedMsg
                 document.getElementById('discussion').appendChild(liElement);
             });
 
@@ -61,10 +63,10 @@
                     console.log('connection started');
                     document.getElementById('sendmessage').addEventListener('click', function (event) {
                         //stops injections in the message
-                        if (!(/^[^<>]+$/.test(messageInput.value))) {
-                            alert("Invalid msg try again!");
-                            return;
-                        }
+                        //if (!(/^[^<>]+$/.test(messageInput.value))) {
+                        //    alert("Invalid msg try again!");
+                        //    return;
+                        //}
                         // Call the Send method on the hub.
                         connection.invoke('send', name, messageInput.value);
 
