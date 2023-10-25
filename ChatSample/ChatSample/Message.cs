@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System;
 using System.Collections.Generic;
 
 namespace ChatSample {
@@ -9,3 +10,4 @@ namespace ChatSample {
         public List<Reaction> Reactions { get; set; } = new List<Reaction>();
     }
 }
+
