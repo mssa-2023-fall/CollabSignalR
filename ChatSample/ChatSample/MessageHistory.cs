@@ -6,6 +6,7 @@ namespace ChatSample
 {
     internal static class MessageHistory
     {
+        static object locker;
         internal readonly static SortedList<Message, Message> messages;
         private static SortedList<Message, Message> _messages = new SortedList<Message, Message>();
         static MessageHistory()
@@ -14,7 +15,10 @@ namespace ChatSample
         }
         internal static void Add(Message message)
         {
-            _messages.Add(message,message);
+            lock(locker) {
+                _messages.Add(message, message);
+            }
+            
         }
     }
 }
