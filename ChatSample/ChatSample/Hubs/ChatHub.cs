@@ -27,7 +27,7 @@ namespace ChatSample.Hubs
             Messages.Add(message);
 
             // Broadcast the message to all connected clients
-            await Clients.All.SendAsync("broadcastMessage", user, message, message.ID);
+            await Clients.All.SendAsync("broadcastMessage", user, message.Text, message.ID);
         }
 
         // Asynchronous method to add a reaction to a message
