@@ -20,7 +20,7 @@ namespace ChatSample.Hubs
             {
                 ID = System.Guid.NewGuid().ToString(), // Assign a unique ID to the message
                 Creator = user, // Set the creator of the message
-                Text = messageText // Set the text of the message
+                Text = messageText // Set the text of the message new
             };
 
             // Add the created message to the list of messages
