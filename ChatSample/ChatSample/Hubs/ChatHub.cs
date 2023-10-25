@@ -13,8 +13,8 @@ namespace ChatSample.Hubs
         public async Task Send(string name, string message)
         {
             // Call the broadcastMessage method to update clients.
-            var msg = new Message() { Timestamp = DateTime.Now, Sender = name, TextMessage = message };
-            MessageHistory.messages.Add(msg, msg);
+            var msg = new Message { Timestamp = DateTime.Now, Sender = name, TextMessage = message };
+            MessageHistory.Add(msg);
             await Clients.All.SendAsync("broadcastMessage", name, message);
 
         }
