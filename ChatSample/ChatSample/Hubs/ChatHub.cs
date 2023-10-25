@@ -71,10 +71,10 @@ namespace ChatSample.Hubs
                 }
 
                 // Broadcast the updated reaction count to all connected clients
-                await Clients.All.SendAsync("updateReactions", messageId, emoji, reaction.Count);
+                await Clients.All.SendAsync("updateReactions", messageId, emoji, message.Reactions.Count);
 
                 // Log the updated reaction count for debugging purposes
-                Console.WriteLine($"Sending count {reaction.Count} for emoji {emoji} for message {messageId}");
+                Console.WriteLine($"User: {user} sending count: {message.Reactions.Count} for emoji: {emoji} for message: {messageId}");
             }
         }
     }

@@ -148,7 +148,8 @@
                     emojiWrapper.appendChild(emojiElement);
                 } else {
                     // If the emoji element exists, update its count
-                    emojiElement.innerHTML = emoji + " " + count;
+                    var parts = emojiElement.innerHTML.split('x');
+                    emojiElement.innerHTML = parts[0] + 'x' + count; // Update only the count part
                 }
             });
 
