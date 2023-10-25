@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Spectre;
 using System.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
+using Spectre.Console;
 
 namespace SignalRConsoleClient
 {
@@ -44,8 +46,8 @@ namespace SignalRConsoleClient
         }
         public void Intro()
         {
-            Console.WriteLine("Welcome to the NerdCraft Chat");
-            Console.WriteLine("Press ESC key to continue");
+            AnsiConsole.MarkupLine("[blue]Welcome to the NerdCraft Chat[/]");
+            AnsiConsole.MarkupLine("[yellow]Press ESC key to continue[/]");
             Console.CursorVisible = false; // Hide the cursor
 
             int screenWidth = Console.WindowWidth;
@@ -75,7 +77,7 @@ namespace SignalRConsoleClient
             while (!exitRequested)
             {
                 Console.SetCursorPosition(position, Console.WindowHeight / 2);
-                Console.Write(hotdog);
+                AnsiConsole.MarkupLine($"[yellow]{hotdog}[/]");
                 Thread.Sleep(animationSpeed);
                 Console.SetCursorPosition(position, Console.WindowHeight / 2);
                 Console.Write(new string(' ', hotdog.Length));
@@ -93,8 +95,8 @@ namespace SignalRConsoleClient
             try
             {
                 await _connection.StartAsync();
-                Console.WriteLine("Connection established.");
-                Console.WriteLine("Type Exit to exit the chat.");
+                AnsiConsole.MarkupLine("[green]Connection established.[/]");
+                AnsiConsole.MarkupLine("[yellow]Type Exit to exit the chat.[/]");
             }
             catch (Exception ex)
             {
@@ -110,7 +112,7 @@ namespace SignalRConsoleClient
 
             _connection.On<string, string>("broadcastMessage", (user, message) =>
             {
-                Console.WriteLine($"\n\r{user}: {message}");
+                AnsiConsole.MarkupLine($"\n\r[blue]{user}: {message}[/]");
             });
 
             while (true)
