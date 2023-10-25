@@ -7,15 +7,19 @@ namespace ChatSample.Hubs
 {
     public class ChatHub : Hub
     {
-        public async Task Send(string usersName, string usersText)
-        {
+        public async Task Send(string name, string message) {
+            // Call the broadcastMessage method to update clients.
+            await Clients.All.SendAsync("broadcastMessage", name, message);
+        }
+
+        public async Task SendReactionSupported(string usersName, string usersText) {
             Message message = new Message() {
                 Creator = usersName,
                 Text = usersText
             };
             // Call the broadcastMessage method to update clients.
 
-            await Clients.All.SendAsync("broadcastMessage", message);
+            await Clients.All.SendAsync("BroadcastReactionSupportedMessage", message);
         }
 
         public async Task AddEmojiCountAsync(string usersName, string emojiValue, Message message) {
@@ -23,7 +27,9 @@ namespace ChatSample.Hubs
             if (!message.Reactions.Any(x => x.Emoji == emojiValue)) {
                 message.Reactions.Add(new Reaction() { Emoji = emojiValue, Count = 0 });
             }
-
+            foreach( var react in message.Reactions) {
+                Console.WriteLine(react);
+            }
             // find reaction
             var reactionIndex = message.Reactions.IndexOf(message.Reactions.Find(x => x.Emoji == emojiValue));
 

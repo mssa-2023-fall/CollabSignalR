@@ -35,9 +35,20 @@
             var connection = new signalR.HubConnectionBuilder()
                                 .withUrl('/chat')
                                 .build();
-                                
+
+            // SUPPORT FOR LEGACY MESSAGES
+            connection.on('broadcastMessage', function (name, message) {
+                // Html encode display name and message.
+                var encodedName = name;
+                var encodedMsg = message;
+                // Add the message to the page.
+                var liElement = document.createElement('li');
+                liElement.innerHTML = '<strong>' + encodedName + '</strong>:&nbsp;&nbsp;' + encodedMsg;
+                document.getElementById('discussion').appendChild(liElement);
+            });
+
             // Create a function that the hub can call to broadcast messages.
-            connection.on('broadcastMessage', function (message) {
+            connection.on('BroadcastReactionSupportedMessage', function (message) {
                 // Html encode display name and message.
                 var encodedName = message.creator;
                 var encodedMsg = message.text;
@@ -63,18 +74,19 @@
                 document.getElementById('discussion').appendChild(liElement);
             });
 
-            //connection.on('UpdateMessageReactions', function (messageID, messageReactions) {
-
-            //};
-
-
+            connection.on('UpdateMessageReactions', function (messageID, messageReactions) {
+                console.log(messageReactions)
+                // need to have a place with all the messages
+                // need to be able to change those messages
+            });
+            
             // Transport fallback functionality is now built into start.
             connection.start()
                 .then(function () {
                     console.log('connection started');
                     document.getElementById('sendmessage').addEventListener('click', function (event) {
                         // Call the Send method on the hub.
-                        connection.invoke('send', name, messageInput.value);
+                        connection.invoke('SendReactionSupported', name, messageInput.value);
 
                         // Clear text box and reset focus for next comment.
                         messageInput.value = '';
