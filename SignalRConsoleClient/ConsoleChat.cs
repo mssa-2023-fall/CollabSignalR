@@ -63,11 +63,8 @@ namespace SignalRConsoleClient
             inputThread.Join(); // Wait for the input thread to exit
             Console.Clear();
         }
-
         public async Task ConnectChat()
         {
-
-
             try
             {
                 await _connection.StartAsync();
@@ -102,7 +99,6 @@ namespace SignalRConsoleClient
                     await _connection.InvokeAsync("Send", username, userLeaving);
                     break; // Exit the while loop and the program
                 }
-
                 message = message + " " + DateTime.Now.ToString();
                 await _connection.InvokeAsync("Send", username, message);
             }
