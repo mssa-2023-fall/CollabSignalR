@@ -134,6 +134,7 @@
             // 
             // nameTextBox
             // 
+            nameTextBox.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             nameTextBox.Location = new System.Drawing.Point(77, 41);
             nameTextBox.Name = "nameTextBox";
             nameTextBox.Size = new System.Drawing.Size(607, 23);
