@@ -13,6 +13,16 @@ class program
         var connection = new HubConnectionBuilder()
                         .WithUrl(string.IsNullOrEmpty(userHubUrl) ? hubUrl : userHubUrl)
                         .Build();
+
+        try
+        {
+            connection.StartAsync().Wait();
+            Console.WriteLine("Connection established.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error starting the connection: {ex.Message}");
+        }
         
         Dictionary<string, string> userDictionary = new Dictionary<string, string>(); //Dictionary to map connectionId with Users
 
@@ -44,15 +54,6 @@ class program
             }
         });
 
-        try
-        {
-            await connection.StartAsync();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error connection to WoN Chat server: {ex.Message}");
-        }
-
         //Enter message and send message async
         while(true)
         {
@@ -65,12 +66,7 @@ class program
                 await connection.InvokeAsync("SendMessage", username, message);
             }
         }
-       
-
-       
     }
-    
-
 }
 
 // Hub: https://chatsample20231024085542.azurewebsites.net/chat
