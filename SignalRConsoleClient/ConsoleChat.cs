@@ -3,18 +3,43 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Configuration;
 
 namespace SignalRConsoleClient
 {
+    public class HomeController : Controller
+    {
+        private readonly IConfiguration _configuration;
+
+        public HomeController(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        public IActionResult Index()
+        {
+            var apiKey = _configuration["MyApiSettings:ApiKey"];
+            return (IActionResult)Content($"API Key: {apiKey}");
+        }
+    }
     public class ConsoleChat
     {
         private HubConnection _connection { get; set; }
 
         public ConsoleChat()
         {
+            var configuration = new ConfigurationBuilder()
+            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+            .AddUserSecrets<Program>()
+            .Build();
+
+            var apiKey = configuration["MyApiSettings:ApiKey"];
+
             _connection = new HubConnectionBuilder()
-                          .WithUrl("https://chatsample20231024085542.azurewebsites.net/chat")
+                          .WithUrl($"{apiKey}")
                           .Build();
         }
         public void Intro()
@@ -85,7 +110,7 @@ namespace SignalRConsoleClient
 
             _connection.On<string, string>("broadcastMessage", (user, message) =>
             {
-                Console.WriteLine($"{user}: {message}");
+                Console.WriteLine($"\n\r{user}: {message}");
             });
 
             while (true)
