@@ -37,6 +37,7 @@ namespace ChatSample.Hubs
 
             if (message != null)
             {
+                // Find the reaction with the given emoji for the message test
                 var reaction = message.Reactions.FirstOrDefault(r => r.Emoji == emoji);
 
                 if (reaction == null)
