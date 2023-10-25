@@ -147,7 +147,6 @@ namespace WindowsFormsSample
             keybd_event(VK_OEM_PERIOD, 0, KEYEVENTF_KEYUP, IntPtr.Zero);
             keybd_event(VK_LWIN, 0, KEYEVENTF_KEYUP, IntPtr.Zero);
 
-            // Set focus to your text box so that the emoji gets inserted there.
             messageTextBox.Focus();
         }
 
