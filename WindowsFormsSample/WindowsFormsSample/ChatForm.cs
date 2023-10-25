@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.AspNetCore.SignalR.Client;
 
@@ -114,7 +115,6 @@ namespace WindowsFormsSample
         private class LogMessage
         {
             public Color MessageColor { get; }
-
             public string Content { get; }
 
             public LogMessage(Color messageColor, string content)
@@ -138,5 +138,24 @@ namespace WindowsFormsSample
         {
 
         }
+
+        private void emojiButton_Click(object sender, EventArgs e)
+        {
+            // Simulate pressing Win+Period
+            keybd_event(VK_LWIN, 0, 0, IntPtr.Zero);
+            keybd_event(VK_OEM_PERIOD, 0, 0, IntPtr.Zero);
+            keybd_event(VK_OEM_PERIOD, 0, KEYEVENTF_KEYUP, IntPtr.Zero);
+            keybd_event(VK_LWIN, 0, KEYEVENTF_KEYUP, IntPtr.Zero);
+
+            // Set focus to your text box so that the emoji gets inserted there.
+            messageTextBox.Focus();
+        }
+
+        [DllImport("user32.dll")]
+        public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, IntPtr dwExtraInfo);
+
+        private const byte VK_LWIN = 0x5B; // Left Windows key
+        private const byte VK_OEM_PERIOD = 0xBE; // Period key
+        private const int KEYEVENTF_KEYUP = 0x0002;
     }
 }
