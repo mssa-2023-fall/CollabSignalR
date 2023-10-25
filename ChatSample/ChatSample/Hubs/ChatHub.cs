@@ -75,31 +75,5 @@ namespace ChatSample.Hubs
             await Clients.All.SendAsync("BroadcastReactionSupportedMessage", message);
         }
 
-        public async Task AddEmojiCountAsync(string usersName, string emojiValue, Message message)
-        {
-            if (!message.Reactions.Any(x => x.Emoji == emojiValue))
-            {
-                message.Reactions.Add(new Reaction { Emoji = emojiValue, Count = 0 });
-            }
-
-            var reactionIndex = message.Reactions.FindIndex(x => x.Emoji == emojiValue);
-
-            if (message.Reactions[reactionIndex].UsersReacted.Contains(usersName))
-            {
-                message.Reactions[reactionIndex].UsersReacted.Remove(usersName);
-                message.Reactions[reactionIndex].Count--;
-
-                if (message.Reactions[reactionIndex].Count == 0)
-                {
-                    message.Reactions.RemoveAt(reactionIndex);
-                }
-            }
-            else
-            {
-                message.Reactions[reactionIndex].Count++;
-            }
-
-            await Clients.All.SendAsync("UpdateMessageReactions", message.ID, message.Reactions);
-        }
     }
 }
