@@ -36,7 +36,7 @@
                                 .withUrl('/chat')
                                 .build();
 
-            // Create a function that the hub can call to broadcast messages.
+            // SUPPORT FOR LEGACY MESSAGES
             connection.on('broadcastMessage', function (name, message) {
                 // Html encode display name and message.
                 var encodedName = name;
@@ -47,13 +47,46 @@
                 document.getElementById('discussion').appendChild(liElement);
             });
 
+            // Create a function that the hub can call to broadcast messages.
+            connection.on('BroadcastReactionSupportedMessage', function (message) {
+                // Html encode display name and message.
+                var encodedName = message.creator;
+                var encodedMsg = message.text;
+                // Add the message to the page.
+                var liElement = document.createElement('li');
+                liElement.innerHTML = '<strong>' + encodedName + '</strong>:&nbsp;&nbsp;' + encodedMsg;
+
+                //Emojis
+                var emojiWrapper = document.createElement('div');
+                var emojis = ['&#128512;', '&#127789;', '&#128578;']; // Add more emojis if you want.
+                emojis.forEach(function (emojiCode) {
+                    var emoji = document.createElement('span');
+                    emoji.innerHTML = emojiCode;
+                    emoji.style.cursor = 'pointer';
+                    emoji.addEventListener('click', function () {
+                        emojiWrapper.innerHTML = emojiCode; // Show only the clicked emoji.
+                        connection.invoke('AddEmojiCountAsync', name, emojiCode, message);
+                    });
+                    emojiWrapper.appendChild(emoji);
+                });
+
+                liElement.appendChild(emojiWrapper);
+                document.getElementById('discussion').appendChild(liElement);
+            });
+
+            connection.on('UpdateMessageReactions', function (messageID, messageReactions) {
+                console.log(messageReactions)
+                // need to have a place with all the messages
+                // need to be able to change those messages
+            });
+            
             // Transport fallback functionality is now built into start.
             connection.start()
                 .then(function () {
                     console.log('connection started');
                     document.getElementById('sendmessage').addEventListener('click', function (event) {
                         // Call the Send method on the hub.
-                        connection.invoke('send', name, messageInput.value);
+                        connection.invoke('SendReactionSupported', name, messageInput.value);
 
                         // Clear text box and reset focus for next comment.
                         messageInput.value = '';
