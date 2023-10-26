@@ -41,7 +41,7 @@ namespace ChatSample.Hubs
             if (message != null)
             {
                 // Find the reaction with the given emoji for the message test
-                var reaction = message.Reactions.FirstOrDefault(r => r.Emoji == emoji);
+                var reaction = message.Reactions.FirstOrDefault(r => r.Emoji.Contains(emoji[0]));
 
                 // If the reaction doesn't exist
                 if (reaction == null)
@@ -69,10 +69,10 @@ namespace ChatSample.Hubs
                 }
 
                 // Broadcast the updated reaction count to all connected clients
-                await Clients.All.SendAsync("updateReactions", messageId, emoji, reaction.Count);
+                await Clients.All.SendAsync("updateReactions", messageId, emoji, reaction.UsersReacted.Count);
 
                 // Log the updated reaction count for debugging purposes
-                Console.WriteLine($"Sending count {reaction.Count} for emoji {emoji} for message {messageId}");
+                Console.WriteLine($"User: {user} sending count: {message.Reactions.Count} for emoji: {emoji} for message: {messageId}");
             }
         }
 
