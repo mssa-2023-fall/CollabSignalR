@@ -95,13 +95,13 @@ namespace SignalRConsoleClient
             try
             {
                 await AnsiConsole.Status()
-    .StartAsync("Connecting...", async ctx =>
-    {
-        // Omitted
-        await _connection.StartAsync();
-        AnsiConsole.MarkupLine("[green]Connection established.[/]");
-        AnsiConsole.MarkupLine("[yellow]Type Exit to exit the chat.[/]");
-    });
+            .StartAsync("Connecting...", async ctx =>
+            {
+                // Omitted
+                await _connection.StartAsync();
+                AnsiConsole.MarkupLine("[green]Connection established.[/]");
+                AnsiConsole.MarkupLine("[yellow]Type Exit to exit the chat.[/]");
+            });
                 
                 
             }
@@ -136,12 +136,15 @@ namespace SignalRConsoleClient
                 Console.CursorVisible = true;
                 
                 var message = Console.ReadLine();
-                await _connection.InvokeAsync("Send", username, message);
-
+                
                 if (message.ToUpper() == "EXIT")
                 {
                     AnsiConsole.MarkupLine($"[aqua]{DateTime.Now.ToString()} {username} is exiting...[/]");
                     break; // Exit the while loop and the program
+                }
+                else
+                {
+                    await _connection.InvokeAsync("Send", username, message);
                 }
                
                 
