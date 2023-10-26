@@ -94,40 +94,57 @@ namespace SignalRConsoleClient
         {
             try
             {
-                await _connection.StartAsync();
-                AnsiConsole.MarkupLine("[green]Connection established.[/]");
-                AnsiConsole.MarkupLine("[yellow]Type Exit to exit the chat.[/]");
+                await AnsiConsole.Status()
+    .StartAsync("Connecting...", async ctx =>
+    {
+        // Omitted
+        await _connection.StartAsync();
+        AnsiConsole.MarkupLine("[green]Connection established.[/]");
+        AnsiConsole.MarkupLine("[yellow]Type Exit to exit the chat.[/]");
+    });
+                
+                
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error starting the connection: {ex.Message}");
                 return;
             }
+
+            _connection.On<string, string>("broadcastMessage", (user, message) =>
+            {
+                AnsiConsole.MarkupLine($"\n\r[teal]{DateTime.Now.ToString()} [/][red]{user}[/]: [blue]{message}[/]");
+            });
         }
         public async Task User()
         {
             
             Console.Write("Enter your username: ");
             var username = Console.ReadLine();
-
-            _connection.On<string, string>("broadcastMessage", (user, message) =>
-            {
-                AnsiConsole.MarkupLine($"\n\r[blue]{user}: {message}[/]");
-            });
-
+            //sends a broadcast of a new Console User
             while (true)
             {
-                Console.Write("Your message: ");
+                //This new user connection needs to be broadcasted to everyone
+                var newUserConnected = $"[aqua]{username} has connected.[/]";
+                await _connection.InvokeAsync("Send", "", newUserConnected);
+                break;
+            }
+
+           //The user can type a message to broadcast to the other users connected
+            while (true)
+            {
+                Console.CursorVisible = true;
+                
                 var message = Console.ReadLine();
+                await _connection.InvokeAsync("Send", username, message);
 
                 if (message.ToUpper() == "EXIT")
                 {
-                    var userLeaving = $"is Exiting..." + " " + DateTime.Now.ToString();
-                    await _connection.InvokeAsync("Send", username, userLeaving);
+                    AnsiConsole.MarkupLine($"[aqua]{DateTime.Now.ToString()} {username} is exiting...[/]");
                     break; // Exit the while loop and the program
                 }
-                message = message + " " + DateTime.Now.ToString();
-                await _connection.InvokeAsync("Send", username, message);
+               
+                
             }
         }
     }
